@@ -116,7 +116,7 @@ def get_embeddings(texts, model, tokenizer, model_type):
 
     # 2. 모델 추론
     with torch.no_grad():
-        outputs = model(**inputs)
+        outputs = model(**inputs)   # 신경망 연산 수행
 
     # 3. 임베딩 추출 전략
     if model_type == "clip":
@@ -170,11 +170,13 @@ if __name__ == "__main__":
             # 인덱싱 시작
             start_time = time.time()
             
+            # 임베딩 생성 (벡터화)
             if model_type == "sbert":
-                # S-BERT는 encode 메서드 바로 사용
+                # S-BERT는 encode 메서드 바로 사용 -> 내부적으로 딥러닝 모델을 돌려 텍스트를 768차원(또는 모델별 차원)의 실수 벡터로 변환
                 embeddings = encoder.encode(descriptions, convert_to_numpy=True)
             else:
-                # BERT/CLIP은 get_embeddings 함수 사용
+                # BERT/CLIP은 get_embeddings 함수 사용 -> model(**inputs)를 호출하여 신경망 연산을 수행하고, 
+                # 그 결과값(outputs.last_hidden_state 등)을 추출하여 벡터로 만든다.
                 model, tokenizer = encoder
                 embeddings = get_embeddings(descriptions, model, tokenizer, model_type)
             
